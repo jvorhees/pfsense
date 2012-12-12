@@ -1,0 +1,17 @@
+System information Widget shrinked down to hardware healths
+
+First modify disk_usage() function in /usr/local/www/includes/functions.inc.php
+so you could define disk(s) mountpoint(s) to monitor inside the widget
+
+function disk_usage($dfmntpoint)
+{
+         $dfout = "";
+         exec("/bin/df -h | /usr/bin/grep -w '".$dfmntpoint."' | /usr/bin/awk '{ print $5 }' | /usr/bin/cut -d '%' -f 1", $dfout);
+         $diskusage = trim($dfout[0]);
+          
+         return $diskusage;
+}
+
+install .php file in /usr/local/www/widgets/widgets
+
+use it from pfsense dashboard
