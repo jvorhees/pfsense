@@ -524,8 +524,17 @@ class altq_root_queue {
 		$tree .= "<td align=\"center\" colspan=\"10\"></td>";
 		$tree .= "</tr>";
 		if (is_array($this->queues)) {
+			$treeidentstring = "&nbsp;";
+			$totalchildqueues = count($this->queues);
+			if ($totalchildqueues > 1) {
+				$treeidentpos .= "|--";
+			} else {
+				$treeidentpos .= "`--";
+			}
+			$currentchildqueue = 1;
 			foreach ($this->queues as $q)  {
-				$tree .= $q->build_smart_tree_tb(5);
+				$tree .= $q->build_smart_tree_tb($treeidentstring,$treeidentpos,$totalchildqueues,$currentchildqueue);
+				$currentchildqueue++;
 			}
 		}
 		return $tree;
@@ -1768,16 +1777,20 @@ class hfsc_queue extends priq_queue {
 		return $tree;
 	}
 
-	function build_smart_tree_tb($qcellpadding) {
+	function build_smart_tree_tb($treeidentstring,$treeidentpos,$totalchildqueues,$currentchildqueue) {
 		global $altqindex;
 		$altqindex++;
+		if ($currentchildqueue == $totalchildqueues) {
+			$treeidentpos = "`--";
+		}
 		$bwcellsclr = "Thistle";
 		$qoptsclr = "Tan";
-		$tree = " <tr style=\"border:1px solid black;\" bgcolor=\"LightGreen\" align=\"center\"><td style=\"padding-left:".$qcellpadding."px;\" align=\"left\"><a href=\"firewall_shaper.php?interface=" . $this->GetInterface() ."&queue=" . $this->GetQname()."&action=show"; 
+		//$tree = " <tr style=\"border:1px solid black;\" bgcolor=\"LightGreen\" align=\"center\"><td style=\"padding-left:".$qcellpadding."px;\" align=\"left\">$treeidentstring <a href=\"firewall_shaper.php?interface=" . $this->GetInterface() ."&queue=" . $this->GetQname()."&action=show";
+		$tree = " <tr style=\"border:1px solid black;\" bgcolor=\"LightGreen\" align=\"center\"><td align=\"left\" style=\"font-family: sans-serif;\">$treeidentstring$treeidentpos&nbsp;<a href=\"firewall_shaper.php?interface=" . $this->GetInterface() ."&queue=" . $this->GetQname()."&action=show";
 		$tree .= "\" ";
-		$tmpvalue = $this->GetDefault();
-		if (!empty($tmpvalue))
-			$tree .= " class=\"navlnk\"";
+		//$tmpvalue = $this->GetDefault();
+		//if (!empty($tmpvalue))
+		//	$tree .= " class=\"navlnk\"";
 		$tree .= " >" . $this->GetQname() . "</a></td>";
 		$tree .= "<td bgcolor=\"".$bwcellsclr."\" align=\"left\" style=\"padding-left:".$qcellpadding."px;\">" .trim($this->GetBandwidth()).$this->GetBwscale(). "</td>";
 		$tree .= "<td bgcolor=\"".$bwcellsclr."\" align=\"left\" style=\"padding-left:".$qcellpadding."px;\">".$this->GetR_m2()."</td><td bgcolor=\"".$bwcellsclr."\" align=\"left\" style=\"padding-left:".$qcellpadding."px;\">".$this->GetL_m2()."</td><td bgcolor=\"".$bwcellsclr."\" align=\"left\" style=\"padding-left:".$qcellpadding."px;\">".$this->GetU_m2()."</td>";
@@ -1793,10 +1806,27 @@ class hfsc_queue extends priq_queue {
 		//$tree .= "<td align=\"left\" id=\"".$this->GetQname()." on ".$this->GetInterface()."\">".$altqindex."</td></tr>";
 		$tree .= "<td id=\"queue".$altqindex."pps\" align=\"left\">-</td><td id=\"queue".$altqindex."bps\" align=\"left\">-</td><td id=\"queue".$altqindex."brw\" align=\"left\">-</td><td id=\"queue".$altqindex."spd\" align=\"left\">-</td><td id=\"queue".$altqindex."drp\" align=\"left\">-</td>";
 		$tree .= "</tr>";
+
 		if (is_array($this->subqueues)) {
-			$qcellpadding = $qcellpadding+5;
-			foreach ($this->subqueues as $q)  {
-				$tree .= $q->build_smart_tree_tb($qcellpadding);
+			//$qcellpadding = $qcellpadding+5;
+
+			if ($treeidentpos == "|--") {
+				$treeidentstring = $treeidentstring."|&nbsp;&nbsp;&nbsp;";
+				//$treeidentstring .= "&nbsp;";
+			} else {
+				$treeidentstring .= "&nbsp;&nbsp;";
+			}
+
+			$totalchildqueues = count($this->subqueues);
+			if ($totalchildqueues > 1) {
+				$treeidentpos = "|--";
+			} else {
+				$treeidentpos = "`--";
+			}
+			$currentchildqueue = 1;
+			foreach ($this->subqueues as $q) {
+				$tree .= $q->build_smart_tree_tb($treeidentstring,$treeidentpos,$totalchildqueues,$currentchildqueue);
+				$currentchildqueue++;
 			}
 		}
 		return $tree;

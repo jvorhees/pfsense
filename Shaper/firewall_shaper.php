@@ -178,7 +178,8 @@ if ($_GET) {
 			$output_config .= "<td rowspan=\"2\">Qlimit<br>/TBR</td>";
 			$output_config .= "<td colspan=\"4\" bgcolor=\"".$qoptsclr."\">Options</td>";
 			$output_config .= "<td rowspan=\"2\">Desc</td>";
-			$output_config .= "<td colspan=\"5\">Qstats <input type=\"button\" value=\"Enable\" onclick=\"getsmartqueueactivity();this.disabled='disabled';\"/> <img id=\"smartqueueloader\" src=\"/themes/{$g['theme']}/images/transparent.gif\" width=\"10px\" height=\"10px\"></td>";
+			$output_config .= "<td colspan=\"5\">Qstats <input type=\"button\" id=\"qstatsstartbutton\" value=\"Start\" onclick=\"getsmartqueueactivity();\"/> <input type=\"button\" id=\"qstatsstopbutton\" value=\"Stop\" onclick=\"stopsmartqueueactivity();\" disabled=\"disabled\"/> <img id=\"smartqueueloader\" src=\"/themes/{$g['theme']}/images/transparent.gif\" width=\"10px\" height=\"10px\"></td>";
+			//$output_config .= "<td colspan=\"5\">Qstats <input type=\"button\" id=\"qstatsbutton\" value=\"Start\"/> <img id=\"smartqueueloader\" src=\"/themes/{$g['theme']}/images/transparent.gif\" width=\"10px\" height=\"10px\"></td>";
 			$output_config .= "</tr>";
 			$output_config .= "<tr width=\"100%\" align=\"center\" bgcolor=\"white\" style=\"font-weight:bold;\">";
 			$output_config .= "<td bgcolor=\"".$bwcellsclr."\">Min</td><td bgcolor=\"".$bwcellsclr."\">Aver</td><td bgcolor=\"".$bwcellsclr."\">Max</td>";
@@ -215,11 +216,17 @@ if ($_GET) {
 
 		        $stat_line_split = split("\|", $stats_line);
 		        $packet_sampled = intval($stat_line_split[2]);
-		        $speed = $stat_line_split[1];
+		        //$speed = $stat_line_split[1];
+			$rawspeed = split(" ", $stat_line_split[1]);
+			//$speed = $rawspeed[0];
+			if ($rawspeed[0] != "0" && $rawspeed[1] == "b/s") {
+				$speed = intval($rawspeed[0])."b/s";
+			} else {
+				$speed = $rawspeed[0];
+			}
 		        $borrows = intval($stat_line_split[3]);
 		        $suspends = intval($stat_line_split[4]);
 		        $drops = intval($stat_line_split[5]);
-
 
 		        //$packet_s = round(400 * (1 - $packet_sampled / $total_packets_s), 0);
 
@@ -511,19 +518,26 @@ foreach($pfctl_vsq_array as $pfctl) {
 
 <script type="text/javascript">
         function getsmartqueueactivity() {
+		$('qstatsstartbutton').disabled = 'disabled';
 		$('smartqueueloader').src = '/themes/<?=$g['theme'] ?>/images/misc/widget_loader.gif';
                 var url = "/firewall_shaper.php";
                 var pars = 'action=activatemonitoring';
                 var myAjax = new Ajax.Request(
                         url,
                         {
+				OnCreate: $('qstatsstopbutton').disabled = 'disabled',
                                 method: 'get',
                                 parameters: pars,
                                 onComplete: activitycallback_smartqueue
                         });
         }
+        function stopsmartqueueactivity() {
+		$('smartqueueloader').src = '/themes/<?=$g['theme'] ?>/images/transparent.gif';
+		$('qstatsstopbutton').disabled = 'disabled';
+		$('qstatsstartbutton').disabled = '';
+                clearTimeout(refreshactivity);
+        }
         function activitycallback_smartqueue(transport) {
-		$('smartqueueloader').src = '/themes/<?=$g['theme'] ?>/images/transparent.gif';	
 		
 		var total_child_queues = <?=$total_child_queues ?>;
 		var child_queues_pfctldata = transport.responseText;
@@ -536,6 +550,7 @@ foreach($pfctl_vsq_array as $pfctl) {
 		while (i<=total_child_queues)
 			{
 				var this_child_values = child_queues_values[j].split("|");
+
 				$('queue'+i+'pps').innerHTML = this_child_values[0];
 				$('queue'+i+'bps').innerHTML = this_child_values[1];
 				$('queue'+i+'brw').innerHTML = this_child_values[2];
@@ -544,14 +559,16 @@ foreach($pfctl_vsq_array as $pfctl) {
 				i++;
 				j++;
 			}
-                setTimeout('getsmartqueueactivity()', 6000);
+		$('smartqueueloader').src = '/themes/<?=$g['theme'] ?>/images/transparent.gif';
+		refreshactivity = setTimeout('getsmartqueueactivity()', 6000);
+		$('qstatsstopbutton').disabled = '';
         }
 	//uncomment this to activate monitoring when first loading page
         //document.observe('dom:loaded', function(){
           //setTimeout('getsmartqueueactivity()', 150);
         //});
 </script>
-td#cashcalculator_total
+
 <div id="inputerrors"></div>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 
