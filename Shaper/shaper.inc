@@ -527,9 +527,7 @@ class altq_root_queue {
 			$treeidentstring = "&nbsp;";
 			$totalchildqueues = count($this->queues);
 			if ($totalchildqueues > 1) {
-				$treeidentpos .= "|--";
-			} else {
-				$treeidentpos .= "`--";
+				$treeidentpos .= "]>";
 			}
 			$currentchildqueue = 1;
 			foreach ($this->queues as $q)  {
@@ -1781,19 +1779,19 @@ class hfsc_queue extends priq_queue {
 		global $altqindex;
 		$altqindex++;
 		if ($currentchildqueue == $totalchildqueues) {
-			$treeidentpos = "`--";
+			$treeidentpos = "[>";
 		}
 		$bwcellsclr = "Thistle";
 		$qoptsclr = "Tan";
-		//$tree = " <tr style=\"border:1px solid black;\" bgcolor=\"LightGreen\" align=\"center\"><td style=\"padding-left:".$qcellpadding."px;\" align=\"left\">$treeidentstring <a href=\"firewall_shaper.php?interface=" . $this->GetInterface() ."&queue=" . $this->GetQname()."&action=show";
-		$tree = " <tr style=\"border:1px solid black;\" bgcolor=\"LightGreen\" align=\"center\"><td align=\"left\" style=\"font-family: sans-serif;\">$treeidentstring$treeidentpos&nbsp;<a href=\"firewall_shaper.php?interface=" . $this->GetInterface() ."&queue=" . $this->GetQname()."&action=show";
-		$tree .= "\" ";
-		//$tmpvalue = $this->GetDefault();
-		//if (!empty($tmpvalue))
-		//	$tree .= " class=\"navlnk\"";
-		$tree .= " >" . $this->GetQname() . "</a></td>";
-		$tree .= "<td bgcolor=\"".$bwcellsclr."\" align=\"left\" style=\"padding-left:".$qcellpadding."px;\">" .trim($this->GetBandwidth()).$this->GetBwscale(). "</td>";
-		$tree .= "<td bgcolor=\"".$bwcellsclr."\" align=\"left\" style=\"padding-left:".$qcellpadding."px;\">".$this->GetR_m2()."</td><td bgcolor=\"".$bwcellsclr."\" align=\"left\" style=\"padding-left:".$qcellpadding."px;\">".$this->GetL_m2()."</td><td bgcolor=\"".$bwcellsclr."\" align=\"left\" style=\"padding-left:".$qcellpadding."px;\">".$this->GetU_m2()."</td>";
+		$tree = "<tr style=\"border:1px solid black;\" bgcolor=\"LightGreen\" align=\"center\">";
+		$tree .= "<td align=\"left\" style=\"font-family: sans-serif;\">$treeidentstring$treeidentpos&nbsp;<a href=\"firewall_shaper.php?interface=" . $this->GetInterface() ."&queue=" . $this->GetQname()."&action=show\">" . $this->GetQname() . "</a></td>";
+
+		if (trim($this->GetBandwidth()) != "") {
+		$tree .= "<td bgcolor=\"".$bwcellsclr."\" align=\"left\">$treeidentstring$treeidentpos&nbsp;" .trim($this->GetBandwidth()).$this->GetBwscale(). "</td>"; } else {
+		$tree .= "<td bgcolor=\"".$bwcellsclr."\" align=\"left\">&nbsp;</td>";
+		}
+
+		$tree .= "<td bgcolor=\"".$bwcellsclr."\" align=\"left\">".$this->GetR_m2()."</td><td bgcolor=\"".$bwcellsclr."\" align=\"left\" style=\"padding-left:".$qcellpadding."px;\">".$this->GetL_m2()."</td><td bgcolor=\"".$bwcellsclr."\" align=\"left\" style=\"padding-left:".$qcellpadding."px;\">".$this->GetU_m2()."</td>";
 		$tree .= "<td>".$this->GetEnabled()."</td>";
 		$tree .= "<td>".$this->GetQpriority()."</td>";
 		$tree .= "<td>".$this->GetQlimit()."</td>";
@@ -1810,7 +1808,7 @@ class hfsc_queue extends priq_queue {
 		if (is_array($this->subqueues)) {
 			//$qcellpadding = $qcellpadding+5;
 
-			if ($treeidentpos == "|--") {
+			if ($treeidentpos == "]>") {
 				$treeidentstring = $treeidentstring."|&nbsp;&nbsp;&nbsp;";
 				//$treeidentstring .= "&nbsp;";
 			} else {
@@ -1819,9 +1817,7 @@ class hfsc_queue extends priq_queue {
 
 			$totalchildqueues = count($this->subqueues);
 			if ($totalchildqueues > 1) {
-				$treeidentpos = "|--";
-			} else {
-				$treeidentpos = "`--";
+				$treeidentpos = "]>";
 			}
 			$currentchildqueue = 1;
 			foreach ($this->subqueues as $q) {

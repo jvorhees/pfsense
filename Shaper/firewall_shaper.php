@@ -178,7 +178,7 @@ if ($_GET) {
 			$output_config .= "<td rowspan=\"2\">Qlimit<br>/TBR</td>";
 			$output_config .= "<td colspan=\"4\" bgcolor=\"".$qoptsclr."\">Options</td>";
 			$output_config .= "<td rowspan=\"2\">Desc</td>";
-			$output_config .= "<td colspan=\"5\">Qstats <input type=\"button\" id=\"qstatsstartbutton\" value=\"Start\" onclick=\"getsmartqueueactivity();\"/> <input type=\"button\" id=\"qstatsstopbutton\" value=\"Stop\" onclick=\"stopsmartqueueactivity();\" disabled=\"disabled\"/> <img id=\"smartqueueloader\" src=\"/themes/{$g['theme']}/images/transparent.gif\" width=\"10px\" height=\"10px\"></td>";
+			$output_config .= "<td colspan=\"5\">Qstats <input type=\"button\" id=\"qstatsstartbutton\" value=\"Start\" onclick=\"getsmartqueueactivity();\"/> <input type=\"button\" id=\"qstatsstopbutton\" value=\"Stop\" onclick=\"stopsmartqueueactivity();\" disabled=\"disabled\"/> <img id=\"smartqueueloader\" src=\"/themes/{$g['theme']}/images/transparent.gif\" width=\"10px\" height=\"10px\">&nbsp;</td>";
 			//$output_config .= "<td colspan=\"5\">Qstats <input type=\"button\" id=\"qstatsbutton\" value=\"Start\"/> <img id=\"smartqueueloader\" src=\"/themes/{$g['theme']}/images/transparent.gif\" width=\"10px\" height=\"10px\"></td>";
 			$output_config .= "</tr>";
 			$output_config .= "<tr width=\"100%\" align=\"center\" bgcolor=\"white\" style=\"font-weight:bold;\">";
@@ -551,13 +551,32 @@ foreach($pfctl_vsq_array as $pfctl) {
 			{
 				var this_child_values = child_queues_values[j].split("|");
 
-				$('queue'+i+'pps').innerHTML = this_child_values[0];
-				$('queue'+i+'bps').innerHTML = this_child_values[1];
-				$('queue'+i+'brw').innerHTML = this_child_values[2];
-				$('queue'+i+'spd').innerHTML = this_child_values[3];
-				$('queue'+i+'drp').innerHTML = this_child_values[4];
-				i++;
-				j++;
+				if (this_child_values[0] != '') {
+					$('queue'+i+'pps').innerHTML = this_child_values[0];
+					$('queue'+i+'bps').innerHTML = this_child_values[1];
+					$('queue'+i+'brw').innerHTML = this_child_values[2];
+					$('queue'+i+'spd').innerHTML = this_child_values[3];
+					$('queue'+i+'drp').innerHTML = this_child_values[4];
+					i++;
+					j++;
+				} else {
+					//something changed in firewall/queues/rules/filter ...
+					$('smartqueueloader').src = '/themes/<?=$g['theme'] ?>/images/icons/icon_frmfld_imp.png';
+
+					//OPTION1: we just silently stop monitoring
+					//stopsmartqueueactivity();
+					//return;
+
+					//OPTION2: we stop monitoring and alert
+					//stopsmartqueueactivity();
+					//alert('Something changed in firewall/queues/rules/filter\n\nYou need to restart queues monitoring');
+					//return;
+
+					//OPTION3: we try to launch forever monitoring
+					clearTimeout(refreshactivity);
+					refreshactivity = setTimeout('getsmartqueueactivity()', 6000);
+					return;
+				}
 			}
 		$('smartqueueloader').src = '/themes/<?=$g['theme'] ?>/images/transparent.gif';
 		refreshactivity = setTimeout('getsmartqueueactivity()', 6000);
