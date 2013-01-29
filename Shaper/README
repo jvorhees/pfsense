@@ -1,7 +1,7 @@
 If you are like me a newbie with HSFC queueing and have a complex
-pfsense setup like multi-wan-lan-squid transparent but you NEED shapping and want understand it a little, you could use an all-in-one global tabular view that include cascading tree-like view, link to straight edit for each queue, options for each queue and monitoring !
+pfsense setup like multi-wan-lan-squid transparent but you NEED shapping and want understand it a little, you could help yourself with using this all-in-one global tabular view that include cascading tree-like view, link to straight edit for each queue, options for each queue and monitoring !
 
-These modifications also include a button to view raw queue configuration
+These modifications also include a button to view raw queue configuration, taken from /tmp/rules.debug
 
 You need to replace two originals pfsense (2.0.1) files (make backup before!!!) firewall_shaper.php and shaper.inc
 in respectively /usr/local/www and /etc/inc
@@ -11,6 +11,8 @@ Implementation will be improved (like include the stuff in different php file an
 Hope this kind of all-in-one view will be included in futures pfsense releases ;-)
 
 Tested with 2.0.1 pfsense.
+
+Feel free to post feedback on the forum if you use it ;-)
 
 att,
 jvorhees.
